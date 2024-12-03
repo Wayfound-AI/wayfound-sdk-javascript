@@ -1,9 +1,9 @@
 const axios = require('axios');
 
-class Recording {
+export class Recording {
     static WAYFOUND_RECORDINGS_URL = "https://app.wayfound.ai/api/v1/recordings/active";
 
-    constructor(wayfoundApiKey = process.env.WAYFOUND_API_KEY, agentId = process.env.WAYFOUND_AGENT_ID, initialMessages = []) {
+    constructor({wayfoundApiKey = process.env.WAYFOUND_API_KEY, agentId = process.env.WAYFOUND_AGENT_ID, recordingId = null, initialMessages = []}) {
         this.wayfoundApiKey = wayfoundApiKey;
         this.agentId = agentId;
 
@@ -17,7 +17,10 @@ class Recording {
             messages: initialMessages
         };
 
-        axios.post(Recording.WAYFOUND_RECORDINGS_URL, payload, { headers: this.headers })
+        if (recordingId) {
+            this.recordingId = recordingId;
+        } else {
+            axios.post(Recording.WAYFOUND_RECORDINGS_URL, payload, { headers: this.headers })
             .then(response => {
                 this.recordingId = response.data.id;
             })
@@ -25,6 +28,7 @@ class Recording {
                 console.error(`Error during POST request: ${error}`);
                 this.recordingId = null;
             });
+        }
     }
 
     recordMessages(messages) {

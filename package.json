@@ -1,19 +1,22 @@
 {
     "name": "wayfound",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "description": "Level up your agents with Wayfound the AI management platform",
     "main": "index.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/Wayfound-AI/wayfound-sdk-javascript.git"
+        "type": "git",
+        "url": "git+https://github.com/Wayfound-AI/wayfound-sdk-javascript.git"
     },
     "author": "Wayfound",
     "license": "MIT",
     "bugs": {
-      "url": "https://github.com/Wayfound-AI/wayfound-sdk-javascript/issues"
+        "url": "https://github.com/Wayfound-AI/wayfound-sdk-javascript/issues"
     },
-    "homepage": "https://github.com/Wayfound-AI/wayfound-sdk-javascript#readme"
-  }
+    "homepage": "https://github.com/Wayfound-AI/wayfound-sdk-javascript#readme",
+    "dependencies": {
+        "axios": "^1.7.8"
+    }
+}
