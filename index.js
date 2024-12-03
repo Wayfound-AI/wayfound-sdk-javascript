@@ -1,3 +1,3 @@
-import Recording from './recording';
+import Recording from './src/recording';
 
 export { Recording };
