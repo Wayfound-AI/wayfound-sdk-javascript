@@ -1,7 +1,7 @@
 import axios from "axios";
 import { version } from "../package.json";
 
-const WAYFOUND_HOST = "http://localhost:3000";
+const WAYFOUND_HOST = `https://app.wayfound.ai`;
 const WAYFOUND_RECORDING_ACTIVE_URL = `${WAYFOUND_HOST}/api/v1/recordings/active`;
 const WAYFOUND_RECORDING_COMPLETED_URL = `${WAYFOUND_HOST}/api/v1/recordings/completed`;
 const SDK_LANGUAGE = "JavaScript";
