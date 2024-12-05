@@ -80,7 +80,6 @@ recording.recordMessages(messages);
 
 Use the SDK to manage agent transcripts and access analytics for monitoring and reporting.
 
-
 ## License
 
 This SDK is licensed under the MIT License
