@@ -1,6 +1,7 @@
 {
     "name": "wayfound",
-    "version": "0.2.2",
+    "version": "0.2.6",
+    "type": "module",
     "description": "Level up your agents with Wayfound the AI management platform",
     "main": "index.js",
     "scripts": {
