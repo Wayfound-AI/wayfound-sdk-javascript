@@ -1,5 +1,4 @@
 import axios from "axios";
-import { version } from "../package.json";
 
 const WAYFOUND_HOST = `https://app.wayfound.ai`;
 const WAYFOUND_RECORDING_ACTIVE_URL = `${WAYFOUND_HOST}/api/v1/recordings/active`;
@@ -16,19 +15,17 @@ export class Recording {
      * @param {string} [params.agentId=process.env.WAYFOUND_AGENT_ID] - The agent ID for the recording.
      * @param {string|null} [params.recordingId=null] - The ID of the recording. If null, a new recording will be created.
      * @param {Array} [params.initialMessages=[]] - An array of initial messages to include in the recording.
-     * @param {boolean} [params.published=true] - A flag indicating whether the recording is published.
      */
-    constructor({wayfoundApiKey = process.env.WAYFOUND_API_KEY, agentId = process.env.WAYFOUND_AGENT_ID, recordingId = null, initialMessages = [], published = true}) {
+    constructor({wayfoundApiKey = process.env.WAYFOUND_API_KEY, agentId = process.env.WAYFOUND_AGENT_ID, recordingId = null, initialMessages = []}) {
         this.wayfoundApiKey = wayfoundApiKey;
         this.agentId = agentId;
-        this.published = published;
         this.recordingId = recordingId;
 
         this.headers = {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${this.wayfoundApiKey}`,
             "X-SDK-Language": SDK_LANGUAGE,
-            "X-SDK-Version": version,
+            "X-SDK-Version": '0.2.6',
         };
     }
 
@@ -51,9 +48,14 @@ export class Recording {
      *     });
      */
     async newRecording({initialMessages = []}) {
-        const recordingUrl = `${WAYFOUND_RECORDINGS_URL}?published=${this.published}`;
+        const recordingUrl = `${WAYFOUND_RECORDING_ACTIVE_URL}`;
         try {
-            const response = await axios.post(recordingUrl, { agentId: this.agentId, messages: initialMessages }, { headers: this.headers });
+            const response = await axios.post(recordingUrl, { 
+                agentId: this.agentId, 
+                messages: initialMessages,
+            }, { 
+                headers: this.headers 
+            });
             this.recordingId = response.data.id;
 
             return this.recordingId;
@@ -89,10 +91,10 @@ export class Recording {
             }
         }
 
-        const recordingUrl = `${WAYFOUND_RECORDING_ACTIVE_URL}?published=${this.published}`;
+        const recordingUrl = `${WAYFOUND_RECORDING_ACTIVE_URL}`;
         const payload = {
             recordingId: this.recordingId,
-            messages: messages
+            messages: messages,
         };
     
         try {
@@ -132,7 +134,7 @@ export class Recording {
             lastMessageAt = new Date().toISOString();
         }
 
-        const recordingUrl = `${WAYFOUND_RECORDING_COMPLETED_URL}?published=${this.published}`;
+        const recordingUrl = `${WAYFOUND_RECORDING_COMPLETED_URL}`;
         const payload = {
             agentId: this.agentId,
             messages: messages,
