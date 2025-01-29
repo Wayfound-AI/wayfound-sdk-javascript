@@ -16,16 +16,26 @@ export class Recording {
      * @param {string|null} [params.recordingId=null] - The ID of the recording. If null, a new recording will be created.
      * @param {Array} [params.initialMessages=[]] - An array of initial messages to include in the recording.
      */
-    constructor({wayfoundApiKey = process.env.WAYFOUND_API_KEY, agentId = process.env.WAYFOUND_AGENT_ID, recordingId = null, initialMessages = []}) {
+    constructor({
+        wayfoundApiKey = process.env.WAYFOUND_API_KEY, 
+        agentId = process.env.WAYFOUND_AGENT_ID, 
+        recordingId = null, 
+        visitorId = null, 
+        visitorDisplayName = null, 
+        initialMessages = []
+    }) {
+
         this.wayfoundApiKey = wayfoundApiKey;
         this.agentId = agentId;
         this.recordingId = recordingId;
+        this.visitorId = visitorId;
+        this.visitorDisplayName = visitorDisplayName;
 
         this.headers = {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${this.wayfoundApiKey}`,
             "X-SDK-Language": SDK_LANGUAGE,
-            "X-SDK-Version": '0.2.6',
+            "X-SDK-Version": '0.2.7',
         };
     }
 
@@ -49,15 +59,27 @@ export class Recording {
      */
     async newRecording({initialMessages = []}) {
         const recordingUrl = `${WAYFOUND_RECORDING_ACTIVE_URL}`;
-        try {
-            const response = await axios.post(recordingUrl, { 
-                agentId: this.agentId, 
-                messages: initialMessages,
-            }, { 
-                headers: this.headers 
-            });
-            this.recordingId = response.data.id;
+        const payload = {
+            agentId: this.agentId,
+            messages: initialMessages,
+        };
 
+        if (this.visitorId) {
+            payload.visitorId = this.visitorId;
+        }
+
+        if (this.visitorDisplayName) {
+            payload.visitorDisplayName = this.visitorDisplayName;
+        }
+
+        try {
+            const response = await axios.post(recordingUrl, 
+                payload, 
+                { 
+                    headers: this.headers 
+                });
+
+            this.recordingId = response.data.id;
             return this.recordingId;
         } catch (error) {
             throw new Error(`Error creating new recording: ${error}`);
@@ -96,6 +118,14 @@ export class Recording {
             recordingId: this.recordingId,
             messages: messages,
         };
+
+        if (this.visitorId) {
+            payload.visitorId = this.visitorId;
+        }
+
+        if (this.visitorDisplayName) {
+            payload.visitorDisplayName = this.visitorDisplayName;
+        }
     
         try {
             const response = await axios.put(recordingUrl, payload, { headers: this.headers });
@@ -125,7 +155,7 @@ export class Recording {
      *         console.error('Error completing recording:', error);
      *     });
      */
-    async completedRecording({messages = [], firstMessageAt = null, lastMessageAt = null, visitorId = null}) {
+    async completedRecording({messages = [], firstMessageAt = null, lastMessageAt = null, visitorId = null, visitorDisplayName = null}) {
         if (!firstMessageAt) {
             firstMessageAt = new Date().toISOString();
         }
@@ -144,6 +174,10 @@ export class Recording {
 
         if (visitorId) {
             payload.visitorId = visitorId;
+        }
+
+        if (visitorDisplayName) {
+            payload.visitorDisplayName = visitorDisplayName;
         }
 
         try {
