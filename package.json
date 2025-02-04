@@ -1,7 +1,8 @@
 {
     "name": "wayfound",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "description": "Level up your agents with Wayfound the AI management platform",
+    "main": "dist/cjs/index.js",
     "module": "dist/esm/index.js",
     "exports": {
         "import": "./dist/esm/index.js",
