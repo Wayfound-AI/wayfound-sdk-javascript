@@ -1,3 +1,3 @@
-import { Recording } from './recording.js';
+import { Session } from "./session.js";
 
-export { Recording };
+export { Session };
