@@ -46,6 +46,7 @@ export class Session {
    * Completes the session by sending the request to Wayfound.
    * @param {Object} params - Parameters for completing the session.
    * @param {Array} [params.messages=[]] - An array of messages to include in the completed session.
+   * @param {boolean} [params.async=true] - Whether to process the session asynchronously. If false, the request will block until processing is complete.
    * @returns {Promise<Object>} - A promise that resolves with the Axios response when the session has been completed.
    * @throws {Error} - Throws an error if the completion request fails.
    *
@@ -60,7 +61,9 @@ export class Session {
    *            content: 'Hello!'
    *          }
    *       },
-   *     ]})
+   *     ],
+   *     async: false // Request will block until processing is complete
+   *     })
    *     .then(() => {
    *         console.log('Session completed successfully');
    *     })
@@ -68,11 +71,12 @@ export class Session {
    *         console.error('Error completing session:', error);
    *     });
    */
-  async completeSession({ messages = [] }) {
+  async completeSession({ messages = [], async = true }) {
     const sessionUrl = `${WAYFOUND_SESSION_COMPLETED_URL}`;
     const payload = {
       agentId: this.agentId,
       messages: messages,
+      async: async,
     };
 
     if (this.visitorId) {

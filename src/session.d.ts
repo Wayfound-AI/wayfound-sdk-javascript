@@ -16,6 +16,7 @@ export interface SessionMessage {
 
 export interface CompleteSessionParams {
   messages?: SessionMessage[];
+  async?: boolean;
 }
 
 export class Session {
