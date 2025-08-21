@@ -1,6 +1,7 @@
 export interface SessionParams {
   wayfoundApiKey?: string;
   agentId?: string;
+  applicationId?: string | null;
   visitorId?: string | null;
   visitorDisplayName?: string | null;
   accountId?: string | null;

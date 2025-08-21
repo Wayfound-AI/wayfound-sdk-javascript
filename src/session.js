@@ -11,6 +11,7 @@ export class Session {
    * @param {Object} params - The parameters for creating a new Session instance.
    * @param {string} [params.wayfoundApiKey=process.env.WAYFOUND_API_KEY] - The Wayfound API key. Defaults to the environment variable WAYFOUND_API_KEY.
    * @param {string} [params.agentId=process.env.WAYFOUND_AGENT_ID] - The agent ID. Defaults to the environment variable WAYFOUND_AGENT_ID.
+   * @param {string|null} [params.applicationId=null] - The application ID. Optional parameter.
    * @param {string|null} [params.visitorId=null] - The visitor's unique identifier.
    * @param {string|null} [params.visitorDisplayName=null] - The display name of the visitor.
    * @param {string|null} [params.accountId=null] - The account's unique identifier.
@@ -19,6 +20,7 @@ export class Session {
   constructor({
     wayfoundApiKey = process.env.WAYFOUND_API_KEY,
     agentId = process.env.WAYFOUND_AGENT_ID,
+    applicationId = process.env.WAYFOUND_APPLICATION_ID,
     visitorId = null,
     visitorDisplayName = null,
     accountId = null,
@@ -26,6 +28,7 @@ export class Session {
   }) {
     this.wayfoundApiKey = wayfoundApiKey;
     this.agentId = agentId;
+    this.applicationId = applicationId;
     this.visitorId = visitorId;
     this.visitorDisplayName = visitorDisplayName;
     this.accountId = accountId;
@@ -35,7 +38,7 @@ export class Session {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.wayfoundApiKey}`,
       "X-SDK-Language": SDK_LANGUAGE,
-      "X-SDK-Version": "2.0.4",
+      "X-SDK-Version": "2.0.5",
     };
   }
 
@@ -86,6 +89,10 @@ export class Session {
 
     if (this.accountDisplayName) {
       payload.accountDisplayName = this.accountDisplayName;
+    }
+
+    if (this.applicationId) {
+      payload.applicationId = this.applicationId;
     }
 
     try {
