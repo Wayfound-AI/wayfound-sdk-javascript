@@ -11,6 +11,7 @@ export class Session {
    * @param {Object} params - The parameters for creating a new Session instance.
    * @param {string} [params.wayfoundApiKey=process.env.WAYFOUND_API_KEY] - The Wayfound API key. Defaults to the environment variable WAYFOUND_API_KEY.
    * @param {string} [params.agentId=process.env.WAYFOUND_AGENT_ID] - The agent ID. Defaults to the environment variable WAYFOUND_AGENT_ID.
+   * @param {string|null} [params.applicationId=null] - The application ID. Optional parameter.
    * @param {string|null} [params.visitorId=null] - The visitor's unique identifier.
    * @param {string|null} [params.visitorDisplayName=null] - The display name of the visitor.
    * @param {string|null} [params.accountId=null] - The account's unique identifier.
@@ -19,6 +20,7 @@ export class Session {
   constructor({
     wayfoundApiKey = process.env.WAYFOUND_API_KEY,
     agentId = process.env.WAYFOUND_AGENT_ID,
+    applicationId = process.env.WAYFOUND_APPLICATION_ID,
     visitorId = null,
     visitorDisplayName = null,
     accountId = null,
@@ -26,6 +28,7 @@ export class Session {
   }) {
     this.wayfoundApiKey = wayfoundApiKey;
     this.agentId = agentId;
+    this.applicationId = applicationId;
     this.visitorId = visitorId;
     this.visitorDisplayName = visitorDisplayName;
     this.accountId = accountId;
@@ -35,7 +38,7 @@ export class Session {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.wayfoundApiKey}`,
       "X-SDK-Language": SDK_LANGUAGE,
-      "X-SDK-Version": "2.0.4",
+      "X-SDK-Version": "2.0.5",
     };
   }
 
@@ -43,6 +46,7 @@ export class Session {
    * Completes the session by sending the request to Wayfound.
    * @param {Object} params - Parameters for completing the session.
    * @param {Array} [params.messages=[]] - An array of messages to include in the completed session.
+   * @param {boolean} [params.async=true] - Whether to process the session asynchronously. If false, the request will block until processing is complete.
    * @returns {Promise<Object>} - A promise that resolves with the Axios response when the session has been completed.
    * @throws {Error} - Throws an error if the completion request fails.
    *
@@ -57,7 +61,9 @@ export class Session {
    *            content: 'Hello!'
    *          }
    *       },
-   *     ]})
+   *     ],
+   *     async: false // Request will block until processing is complete
+   *     })
    *     .then(() => {
    *         console.log('Session completed successfully');
    *     })
@@ -65,11 +71,12 @@ export class Session {
    *         console.error('Error completing session:', error);
    *     });
    */
-  async completeSession({ messages = [] }) {
+  async completeSession({ messages = [], async = true }) {
     const sessionUrl = `${WAYFOUND_SESSION_COMPLETED_URL}`;
     const payload = {
       agentId: this.agentId,
       messages: messages,
+      async: async,
     };
 
     if (this.visitorId) {
@@ -86,6 +93,10 @@ export class Session {
 
     if (this.accountDisplayName) {
       payload.accountDisplayName = this.accountDisplayName;
+    }
+
+    if (this.applicationId) {
+      payload.applicationId = this.applicationId;
     }
 
     try {

@@ -1,6 +1,7 @@
 export interface SessionParams {
   wayfoundApiKey?: string;
   agentId?: string;
+  applicationId?: string | null;
   visitorId?: string | null;
   visitorDisplayName?: string | null;
   accountId?: string | null;
@@ -15,6 +16,7 @@ export interface SessionMessage {
 
 export interface CompleteSessionParams {
   messages?: SessionMessage[];
+  async?: boolean;
 }
 
 export class Session {
