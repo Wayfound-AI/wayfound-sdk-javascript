@@ -2,6 +2,7 @@ import axios from "axios";
 
 const WAYFOUND_HOST = `https://app.wayfound.ai`;
 const WAYFOUND_SESSION_COMPLETED_URL = `${WAYFOUND_HOST}/api/v2/sessions/completed`;
+const WAYFOUND_APPEND_TO_SESSION_URL = `${WAYFOUND_HOST}/api/v2/sessions`;
 const SDK_LANGUAGE = "JavaScript";
 
 export class Session {
@@ -16,6 +17,7 @@ export class Session {
    * @param {string|null} [params.visitorDisplayName=null] - The display name of the visitor.
    * @param {string|null} [params.accountId=null] - The account's unique identifier.
    * @param {string|null} [params.accountDisplayName=null] - The display name of the account.
+   * @param {string|null} [params.sessionId=null] - The session ID. Optional parameter for existing sessions.
    */
   constructor({
     wayfoundApiKey = process.env.WAYFOUND_API_KEY,
@@ -25,6 +27,7 @@ export class Session {
     visitorDisplayName = null,
     accountId = null,
     accountDisplayName = null,
+    sessionId = null,
   }) {
     this.wayfoundApiKey = wayfoundApiKey;
     this.agentId = agentId;
@@ -33,12 +36,13 @@ export class Session {
     this.visitorDisplayName = visitorDisplayName;
     this.accountId = accountId;
     this.accountDisplayName = accountDisplayName;
+    this.sessionId = sessionId;
 
     this.headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.wayfoundApiKey}`,
       "X-SDK-Language": SDK_LANGUAGE,
-      "X-SDK-Version": "2.0.5",
+      "X-SDK-Version": "2.1.0",
     };
   }
 
@@ -72,6 +76,12 @@ export class Session {
    *     });
    */
   async completeSession({ messages = [], async = true }) {
+    if (this.sessionId !== null) {
+      throw new Error(
+        "Session already completed. Use appendToSession to add more messages."
+      );
+    }
+
     const sessionUrl = `${WAYFOUND_SESSION_COMPLETED_URL}`;
     const payload = {
       agentId: this.agentId,
@@ -106,9 +116,73 @@ export class Session {
       if (response.status !== 200) {
         throw new Error(`Error completing session request: ${response.status}`);
       }
+      this.sessionId = response.data.id;
       return response.data;
     } catch (error) {
       throw new Error(`Error completing session request: ${error.message}`);
+    }
+  }
+
+  /**
+   * Appends messages to an existing session.
+   * @param {Object} params - Parameters for appending to the session.
+   * @param {Array} [params.messages=[]] - An array of messages to append to the session.
+   * @param {boolean} [params.async=true] - Whether to process the append asynchronously. If false, the request will block until processing is complete.
+   * @returns {Promise<Object>} - A promise that resolves with the API response when messages have been appended.
+   * @throws {Error} - Throws an error if no session ID is available or if the append request fails.
+   *
+   * @example
+   * const session = new Session({ wayfoundApiKey: 'your-api-key', agentId: 'your-agent-id' });
+   * // First complete a session to get a session ID
+   * await session.completeSession({ messages: [...] });
+   *
+   * // Then append additional messages
+   * session.appendToSession({
+   *     messages: [
+   *       {
+   *          timestamp: "2025-05-07T10:05:00Z",
+   *          event_type: 'user_message',
+   *          attributes: {
+   *            content: 'Follow up message'
+   *          }
+   *       },
+   *     ],
+   *     async: false // Request will block until processing is complete
+   *     })
+   *     .then(() => {
+   *         console.log('Messages appended successfully');
+   *     })
+   *     .catch(error => {
+   *         console.error('Error appending to session:', error);
+   *     });
+   */
+  async appendToSession({ messages = [], async = true }) {
+    if (this.sessionId === null) {
+      throw new Error(
+        "No sessionId available. Complete a session first before appending."
+      );
+    }
+
+    if (messages === null) {
+      messages = [];
+    }
+
+    const appendUrl = `${WAYFOUND_APPEND_TO_SESSION_URL}/${this.sessionId}`;
+    const payload = {
+      messages: messages,
+      async: async,
+    };
+
+    try {
+      const response = await axios.put(appendUrl, payload, {
+        headers: this.headers,
+      });
+      if (response.status !== 200) {
+        throw new Error(`Error appending to session: ${response.status}`);
+      }
+      return response.data;
+    } catch (error) {
+      throw new Error(`Error appending to session: ${error.message}`);
     }
   }
 }
