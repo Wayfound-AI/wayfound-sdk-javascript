@@ -76,7 +76,7 @@ const messages = [
     },
   },
 ];
-await session.completeSession({ messages });
+await session.create({ messages });
 ```
 
 ## License

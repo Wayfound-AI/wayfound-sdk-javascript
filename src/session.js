@@ -42,7 +42,7 @@ export class Session {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.wayfoundApiKey}`,
       "X-SDK-Language": SDK_LANGUAGE,
-      "X-SDK-Version": "2.2.0",
+      "X-SDK-Version": "2.3.0",
     };
   }
 
