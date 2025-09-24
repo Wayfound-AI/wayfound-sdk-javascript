@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const WAYFOUND_HOST = `https://app.wayfound.ai`;
-const WAYFOUND_SESSION_COMPLETED_URL = `${WAYFOUND_HOST}/api/v2/sessions/completed`;
+const WAYFOUND_CREATE_SESSION_URL = `${WAYFOUND_HOST}/api/v2/sessions`;
 const WAYFOUND_APPEND_TO_SESSION_URL = `${WAYFOUND_HOST}/api/v2/sessions`;
 const SDK_LANGUAGE = "JavaScript";
 
@@ -42,21 +42,21 @@ export class Session {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.wayfoundApiKey}`,
       "X-SDK-Language": SDK_LANGUAGE,
-      "X-SDK-Version": "2.1.0",
+      "X-SDK-Version": "2.2.0",
     };
   }
 
   /**
-   * Completes the session by sending the request to Wayfound.
-   * @param {Object} params - Parameters for completing the session.
-   * @param {Array} [params.messages=[]] - An array of messages to include in the completed session.
+   * Creates a session by sending the request to Wayfound.
+   * @param {Object} params - Parameters for creating the session.
+   * @param {Array} [params.messages=[]] - An array of messages to include in the session.
    * @param {boolean} [params.async=true] - Whether to process the session asynchronously. If false, the request will block until processing is complete.
-   * @returns {Promise<Object>} - A promise that resolves with the Axios response when the session has been completed.
-   * @throws {Error} - Throws an error if the completion request fails.
+   * @returns {Promise<Object>} - A promise that resolves with the API response when the session has been created.
+   * @throws {Error} - Throws an error if the creation request fails.
    *
    * @example
    * const session = new Session({ wayfoundApiKey: 'your-api-key', agentId: 'your-agent-id' });
-   * session.completeSession({
+   * session.create({
    *     messages: [
    *       {
    *          timestamp: "2025-05-07T10:00:00Z",
@@ -69,20 +69,20 @@ export class Session {
    *     async: false // Request will block until processing is complete
    *     })
    *     .then(() => {
-   *         console.log('Session completed successfully');
+   *         console.log('Session created successfully');
    *     })
    *     .catch(error => {
-   *         console.error('Error completing session:', error);
+   *         console.error('Error creating session:', error);
    *     });
    */
-  async completeSession({ messages = [], async = true }) {
+  async create({ messages = [], async = true }) {
     if (this.sessionId !== null) {
       throw new Error(
-        "Session already completed. Use appendToSession to add more messages."
+        "Session already created. Use appendToSession to add more messages."
       );
     }
 
-    const sessionUrl = `${WAYFOUND_SESSION_COMPLETED_URL}`;
+    const sessionUrl = `${WAYFOUND_CREATE_SESSION_URL}`;
     const payload = {
       agentId: this.agentId,
       messages: messages,
@@ -114,13 +114,50 @@ export class Session {
         headers: this.headers,
       });
       if (response.status !== 200) {
-        throw new Error(`Error completing session request: ${response.status}`);
+        throw new Error(`Error creating session: ${response.status}`);
       }
       this.sessionId = response.data.id;
       return response.data;
     } catch (error) {
-      throw new Error(`Error completing session request: ${error.message}`);
+      throw new Error(`Error creating session: ${error.message}`);
     }
+  }
+
+  /**
+   * @deprecated Use create() instead. This method will be removed in a future version.
+   * Completes the session by sending the request to Wayfound.
+   * @param {Object} params - Parameters for completing the session.
+   * @param {Array} [params.messages=[]] - An array of messages to include in the completed session.
+   * @param {boolean} [params.async=true] - Whether to process the session asynchronously. If false, the request will block until processing is complete.
+   * @returns {Promise<Object>} - A promise that resolves with the Axios response when the session has been completed.
+   * @throws {Error} - Throws an error if the completion request fails.
+   *
+   * @example
+   * const session = new Session({ wayfoundApiKey: 'your-api-key', agentId: 'your-agent-id' });
+   * session.completeSession({
+   *     messages: [
+   *       {
+   *          timestamp: "2025-05-07T10:00:00Z",
+   *          event_type: 'user_message',
+   *          attributes: {
+   *            content: 'Hello!'
+   *          }
+   *       },
+   *     ],
+   *     async: false // Request will block until processing is complete
+   *     })
+   *     .then(() => {
+   *         console.log('Session completed successfully');
+   *     })
+   *     .catch(error => {
+   *         console.error('Error completing session:', error);
+   *     });
+   */
+  async completeSession({ messages = [], async = true }) {
+    console.warn(
+      "DEPRECATED: completeSession() is deprecated and will be removed in a future version. Use create() instead."
+    );
+    return this.create({ messages, async });
   }
 
   /**
