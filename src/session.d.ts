@@ -7,6 +7,7 @@ export interface SessionParams {
   accountId?: string | null;
   accountDisplayName?: string | null;
   sessionId?: string | null;
+  metadata?: string | Record<string, any> | null;
 }
 
 export interface SessionMessage {

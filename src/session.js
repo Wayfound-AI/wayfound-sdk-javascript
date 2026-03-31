@@ -18,6 +18,7 @@ export class Session {
    * @param {string|null} [params.accountId=null] - The account's unique identifier.
    * @param {string|null} [params.accountDisplayName=null] - The display name of the account.
    * @param {string|null} [params.sessionId=null] - The session ID. Optional parameter for existing sessions.
+   * @param {string|Record<string, any>|null} [params.metadata=null] - Custom session metadata. Accepts a JSON string or an object (will be stringified automatically).
    */
   constructor({
     wayfoundApiKey = process.env.WAYFOUND_API_KEY,
@@ -28,6 +29,7 @@ export class Session {
     accountId = null,
     accountDisplayName = null,
     sessionId = null,
+    metadata = null,
   }) {
     this.wayfoundApiKey = wayfoundApiKey;
     this.agentId = agentId;
@@ -37,12 +39,15 @@ export class Session {
     this.accountId = accountId;
     this.accountDisplayName = accountDisplayName;
     this.sessionId = sessionId;
+    this.metadata = metadata !== null && typeof metadata === "object"
+      ? JSON.stringify(metadata)
+      : metadata;
 
     this.headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.wayfoundApiKey}`,
       "X-SDK-Language": SDK_LANGUAGE,
-      "X-SDK-Version": "2.3.0",
+      "X-SDK-Version": "2.4.0",
     };
   }
 
@@ -107,6 +112,10 @@ export class Session {
 
     if (this.applicationId) {
       payload.applicationId = this.applicationId;
+    }
+
+    if (this.metadata) {
+      payload.metadata = this.metadata;
     }
 
     try {

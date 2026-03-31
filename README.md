@@ -48,10 +48,25 @@ import { Session } from "wayfound";
 const session = new Session({
   wayfoundApiKey: "<API_KEY>",
   agentId: "<AGENT_ID>",
+  metadata: { source: "web", plan: "pro" }, // optional, accepts an object or JSON string
 });
 ```
 
 Replace <API_KEY> and <AGENT_ID> with your actual API key and Agent ID, for production scenarios keep the <API_KEY> secure.
+
+#### Options
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `wayfoundApiKey` | string | Your Wayfound API key (defaults to `WAYFOUND_API_KEY` env var) |
+| `agentId` | string | Your Agent ID (defaults to `WAYFOUND_AGENT_ID` env var) |
+| `applicationId` | string | Optional application identifier (defaults to `WAYFOUND_APPLICATION_ID` env var) |
+| `visitorId` | string | Optional visitor identifier |
+| `visitorDisplayName` | string | Optional visitor display name |
+| `accountId` | string | Optional account identifier |
+| `accountDisplayName` | string | Optional account display name |
+| `sessionId` | string | Optional session ID for existing sessions |
+| `metadata` | string \| object | Optional custom session metadata. Objects are automatically JSON-stringified. |
 
 ### Usage
 
