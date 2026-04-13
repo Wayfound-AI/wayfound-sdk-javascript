@@ -4,9 +4,16 @@
   "description": "Wayfound AI Agent management platform",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
+  "types": "index.d.ts",
   "exports": {
-    "import": "./dist/esm/index.js",
-    "require": "./dist/cjs/index.js"
+    "import": {
+      "types": "./index.d.ts",
+      "default": "./dist/esm/index.js"
+    },
+    "require": {
+      "types": "./index.d.ts",
+      "default": "./dist/cjs/index.js"
+    }
   },
   "scripts": {
     "build": "rollup -c",
